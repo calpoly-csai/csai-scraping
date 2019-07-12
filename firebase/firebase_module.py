@@ -11,8 +11,14 @@ from google.cloud.client import Client
 
 class FirebaseModule(BindingSpec):
     def provide_db(self) -> Client:
-        with open(sys.path[0] + "/cred_path", 'r') as f:
-            cred_path = f.read()
+        for i, path in enumerate(sys.path):
+            try:
+                with open(path + "/cred_path", 'r') as f:
+                    cred_path = f.read()
+                break
+            except FileNotFoundError:
+                if i == len(sys.path) - 1:
+                    raise FileNotFoundError("Credential file path not found")
 
         creds = credentials.Certificate(cred_path)
         firebase_admin.initialize_app(creds)

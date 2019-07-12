@@ -35,5 +35,3 @@ if __name__ == '__main__':
 
     sustainer = Sustainer()
     sustainer.start()
-
-    os.remove(sys.path[0] + "/cred_path")
