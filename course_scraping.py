@@ -3,123 +3,144 @@
 
 import requests
 from bs4 import BeautifulSoup
-import openpyxl
-from time import sleep
 
-def get_soup(link):
-    return BeautifulSoup((requests.get(link)).text, 'html.parser')
+from firebase.firebase_proxy import FirebaseProxy
+from transaction import Transaction
 
-# Retrieves department list from Cal Poly
-print('Retrieving Cal Poly department names...\n')
-top_link = 'http://catalog.calpoly.edu/coursesaz/'
-top_soup = get_soup(top_link)
 
-departments_az = top_soup.find(id="/coursesaz/")
-department_urls = [department.get('href') for department in departments_az.find_all('a')]
 
-# Retrieves course info for each department
-for department in department_urls:
-    sleep(1)
-    # Extracts the department name from the URL
-    dep_name = (department.rsplit('/',2)[1]).upper()
-    print("Scraping " + dep_name + " department...\n")
-    # Creates a new spreadsheet
-    wb = openpyxl.Workbook()
-    main = wb.active
-    main.title = dep_name
-    main["A1"] = 'Course name'
-    main["B1"] = 'Units'
-    main["C1"] = 'Prerequisites'
-    main["D1"] = "Corequisites"
-    main["E1"] = "Concurrent"
-    main["F1"] = 'Recommended'
-    main["G1"] = 'Terms Typically Offered'
-    row = 2
+class CourseScraper:
+    # Firestore client parameter must be named "firebase_proxy" for dependency
+    # injection to work
+    # (https://github.com/google/pinject#basic-dependency-injection)
+    def __init__(self, firebase_proxy: FirebaseProxy):
+        self.firebase_proxy = firebase_proxy
 
-    # Gets raw list of courses and info for department
-    dep_link = 'http://catalog.calpoly.edu' + department
-    dep_soup = get_soup(dep_link)
-    courses = dep_soup.findAll("div", {"class": "courseblock"})
+        # Collection where all scraped documents will go
+        self.COLLECTION = "Scraped"
+        # Document type of a course entry
+        self.DOCUMENT_TYPE = "course"
 
-    # Extract info for each class and populate spreadsheet
-    for course in courses:
-        course_name_and_units = (course.find("p", {"class": "courseblocktitle"})).get_text()
-        course_name, course_units = course_name_and_units.splitlines()
-        course_units = course_units.split(' ',1)[0]
+    @staticmethod
+    def get_soup(link):
+        return BeautifulSoup((requests.get(link)).text, 'html.parser')
 
-        course_terms_and_reqs = (course.find("div", {"class": "noindent courseextendedwrap"})).get_text()
-        section = None
-        course_prereqs, course_coreqs, course_conc, course_rec, course_terms = [],[],[],[],[]
+    def parse(self):
+        # Retrieves department list from Cal Poly
+        top_link = 'http://catalog.calpoly.edu/coursesaz/'
+        top_soup = self.get_soup(top_link)
 
-        for word in course_terms_and_reqs.split():
-            if word.endswith(':'):
-                if word == 'Offered:':
-                    section = 'terms'
-                # Last term (F,W,SP, etc) will be appended to the front of "Prerequisite:" or whatever category comes
-                # immediately after terms offered, so "str.endswith(blah)" has to be done instead of "str == blah"
-                elif word.endswith('Prerequisite:'):
-                    try:
-                        course_terms.append((word.split('Pre'))[0])
-                    except IndexError:
-                        pass
-                    section = 'prereq'
-                elif word.endswith('Corequisite:'):
-                    try:
-                        course_terms.append((word.split('Cor'))[0])
-                    except IndexError:
-                        pass
-                    section = 'coreq'
-                elif word.endswith('Concurrent:'):
-                    try:
-                        course_terms.append((word.split('Con'))[0])
-                    except IndexError:
-                        pass
-                    section = 'conc'
-                elif word.endswith('Recommended:'):
-                    try:
-                        course_terms.append((word.split('Rec'))[0])
-                    except IndexError:
-                        pass
-                    section = 'rec'
-                else:
-                    pass
+        departments_az = top_soup.find(id="/coursesaz/")
+        department_urls = [department.get('href')
+                           for department in departments_az.find_all('a')]
 
-            else:
-                if section == 'prereq':
-                    course_prereqs.append(word)
-                elif section == 'coreq':
-                    course_coreqs.append(word)
-                elif section == 'conc':
-                    course_conc.append(word)
-                elif section == 'rec':
-                    course_rec.append(word)
-                elif section == 'terms':
-                    course_terms.append(word)
-                else:
-                    pass
+        # This will store all courses that will be added to firebase. These
+        # will all be written at once with a "batch write" to avoid calling
+        # firebase a high number of times
+        firebase_transactions = []
 
-        def join_or_na_if_none(words):
-            if words:
-                return ' '.join(words)
-            else:
-                return 'NA'
+        # Retrieves course info for each department
+        for department in department_urls:
+            # Extracts the department name from the URL
+            dep_name = (department.rsplit('/', 2)[1]).upper()
 
-        course_prereqs = join_or_na_if_none(course_prereqs)
-        course_coreqs = join_or_na_if_none(course_coreqs)
-        course_conc = join_or_na_if_none(course_conc)
-        course_rec = join_or_na_if_none(course_rec)
-        course_terms = join_or_na_if_none(course_terms)
+            # Gets raw list of courses and info for department
+            dep_link = 'http://catalog.calpoly.edu' + department
+            dep_soup = self.get_soup(dep_link)
+            courses = dep_soup.findAll("div", {"class": "courseblock"})
 
-        row_string = str(row)
-        main["A" + row_string] = course_name
-        main["B" + row_string] = course_units
-        main["C" + row_string] = course_prereqs
-        main["D" + row_string] = course_coreqs
-        main["E" + row_string] = course_conc
-        main["F" + row_string] = course_rec
-        main["G" + row_string] = course_terms
-        row += 1
+            # Extract info for each class and create dictonary object
+            for course in courses:
+                course_name_and_units = (course.find("p", {"class": "courseblocktitle"})).get_text()
+                course_name, course_units = course_name_and_units.splitlines()
+                course_units = course_units.split(' ',1)[0]
 
-    wb.save(dep_name + ".xlsx")
+                course_terms_and_reqs = (course.find("div", {"class": "noindent courseextendedwrap"})).get_text()
 
-print('\n\nALL DONE')
+                section = None
+                course_prereqs, course_coreqs, course_conc, course_rec, course_terms = [],[],[],[],[]
+
+                for word in course_terms_and_reqs.split():
+                    if word.endswith(':'):
+                        if word == 'Offered:':
+                            section = 'terms'
+                        # Last term (F,W,SP, etc) will be appended to the front of "Prerequisite:" or whatever category comes
+                        # immediately after terms offered, so "str.endswith(blah)" has to be done instead of "str == blah"
+                        elif word.endswith('Prerequisite:'):
+                            try:
+                                course_terms.append((word.split('Pre'))[0])
+                            except IndexError:
+                                pass
+                            section = 'prereq'
+                        elif word.endswith('Corequisite:'):
+                            try:
+                                course_terms.append((word.split('Cor'))[0])
+                            except IndexError:
+                                pass
+                            section = 'coreq'
+                        elif word.endswith('Concurrent:'):
+                            try:
+                                course_terms.append((word.split('Con'))[0])
+                            except IndexError:
+                                pass
+                            section = 'conc'
+                        elif word.endswith('Recommended:'):
+                            try:
+                                course_terms.append((word.split('Rec'))[0])
+                            except IndexError:
+                                pass
+                            section = 'rec'
+                        else:
+                            pass
+
+                    else:
+                        if section == 'prereq':
+                            course_prereqs.append(word)
+                        elif section == 'coreq':
+                            course_coreqs.append(word)
+                        elif section == 'conc':
+                            course_conc.append(word)
+                        elif section == 'rec':
+                            course_rec.append(word)
+                        elif section == 'terms':
+                            course_terms.append(word)
+                        else:
+                            pass
+
+                def join_or_na_if_none(words):
+                    if words:
+                        return ' '.join(words)
+                    else:
+                        return 'NA'
+
+                course_prereqs = join_or_na_if_none(course_prereqs)
+                course_coreqs = join_or_na_if_none(course_coreqs)
+                course_conc = join_or_na_if_none(course_conc)
+                course_rec = join_or_na_if_none(course_rec)
+                course_terms = join_or_na_if_none(course_terms)
+
+                # Define data in a python dictionary
+                document = {
+                    "department": dep_name,
+                    "courseName": course_name,
+                    "units": course_units,
+                    "prerequisites": course_prereqs,
+                    "corequisites": course_coreqs,
+                    "concurrent": course_conc,
+                    "recommended": course_rec,
+                    "termsTypicallyOffered": course_terms
+                }
+
+                print("Storing course: {} with document {}".format(
+                    course_name, document))
+
+                # Create firebase Transaction type and add to list for
+                # batched write
+                firebase_transactions.append(Transaction(self.COLLECTION,
+                                                         course_name,
+                                                         document,
+                                                         self.DOCUMENT_TYPE))
+
+        # Call the firebase proxy interface to add course entries to
+        # firestore
+        self.firebase_proxy.batched_write(firebase_transactions)
