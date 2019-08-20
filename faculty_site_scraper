@@ -1,0 +1,92 @@
+import os
+import requests
+from bs4 import BeautifulSoup
+import re
+from urllib.request import urlopen
+
+
+def emailExtractor(url, emailList):
+    getH = requests.get(url)
+    h = getH.content
+    soup = BeautifulSoup(h, 'html.parser')
+    mailtos = soup.select('a[href^=mailto]')
+    for i in mailtos:
+        href = i['href']
+        try:
+            str1, str2 = href.split(':')
+        except ValueError:
+            break
+        emailList.append(str2)
+
+
+def get_data(url):
+    myRequest = requests.get(url)
+
+    soup = BeautifulSoup(myRequest.text, "html.parser")
+
+    professor = {}
+
+
+
+    #if (soup.find('table', attrs={'id': 'blankTable'}) > 0):
+
+    table = soup.find('table', attrs={'id': 'blankTable'})
+
+    if len(table.find_all('tr')) > 1:
+        info = table.find_all('tr')[1].find_all('td')
+
+        professor['Days'] = info[0].get_text()
+        professor['Time'] = info[1].get_text()
+        professor['Description'] = info[2].get_text()
+
+    
+        if len(table.find_all('tr')) > 2:
+            infoRowTwo = table.find_all('tr')[2].find_all('td')
+
+            professor['Alternative Days'] = infoRowTwo[0].get_text()
+            professor['Alternative Time'] = infoRowTwo[1].get_text()
+            professor['Alternative Description'] = infoRowTwo[2].get_text()
+
+            
+            if len(table.find_all('tr')) > 3:
+                infoRowThree = table.find_all('tr')[3].find_all('td')
+
+                professor['Alternative Days Three'] = infoRowThree[0].get_text()
+                professor['Alternative Time Three'] = infoRowThree[1].get_text()
+                professor['Alternative Description Three'] = infoRowThree[2].get_text()
+
+
+                if len(table.find_all('tr')) > 4:
+                    infoRowFour = table.find_all('tr')[4].find_all('td')
+
+                    professor['Alternative Days Four'] = infoRowFour[0].get_text()
+                    professor['Alternative Time Four'] = infoRowFour[1].get_text()
+                    professor['Alternative Description Four'] = infoRowFour[2].get_text()
+
+    #else:
+        #print("There is no table")
+    
+
+    f = urlopen(url)
+
+    s = BeautifulSoup(f, 'html.parser')
+    s = s.get_text()
+
+    phone = re.findall(r"((?:\d{3}|\(\d{3}\))?(?:\s|-|\.)?\d{3}(?:\s|-|\.)\d{4})",s)
+    domain = url.split(".")
+
+    if len(phone) > 0:
+        professor['Phone Number'] = phone[0]
+
+    emailList = []
+
+    emailExtractor(url, emailList)
+    professor['Email'] = emailList[0].replace("(place an 'at' sign here)", "@")
+    
+    print(professor)
+
+
+if __name__ == "__main__":
+    print("Enter website address: ")
+    url = input()
+    get_data(url)
