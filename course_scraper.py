@@ -34,7 +34,7 @@ class CourseScraper:
         # Retrieves department list from Cal Poly
         if all_departments:
             top_link = "http://catalog.calpoly.edu/coursesaz/"
-            top_soup = scraper.get_soup(top_link)
+            top_soup = scraper.get_soup(top_link, ver=False)
             # Changed scraping method because source for visible links changed, but
             # old links are still in the source and cause some 404 errors
             departments_az = top_soup.find('table')
@@ -149,3 +149,12 @@ class CourseScraper:
         # Call the firebase proxy interface to add course entries to
         # firestore
         return firebase_transactions
+
+
+if __name__ == '__main__':
+    courses = CourseScraper(scraper.blank_proxy).scrape(no_upload=True)
+    for c in courses:
+        print(c.document_name)
+        for key, value in c.document.items():
+            print(f'\t{key}: {value}')
+        print()
