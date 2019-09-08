@@ -145,4 +145,19 @@ class CalendarScraper:
                 starting_year += 1
 
 
-
+if __name__ == '__main__':
+    calendar = CalendarScraper(scraper.blank_proxy).scrape(no_upload=True)
+    cal = calendar[0].document
+    for year, months in cal.items():
+        print(year)
+        print()
+        for month, days in months.items():
+            print(f'\t{month}')
+            print()
+            for day, events in days.items():
+                print(f'\t\t{day}')
+                for event in events:
+                    print(f'\t\t\t{event}')
+            print()
+        print()
+        print()
