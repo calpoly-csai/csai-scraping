@@ -1,10 +1,14 @@
 import requests
 from bs4 import BeautifulSoup
 from timeit import default_timer as timer
+from google.cloud.firestore_v1 import Client
+from firebase.firebase_proxy import FirebaseProxy
 
+
+blank_proxy = FirebaseProxy(None)
 
 # TODO: Add support for user agent headers
-def get_soup(url, to=10):
+def get_soup(url, to=10, ver=True):
     """
     Turns a URL into a parsed BeautifulSoup object and
     raises exceptions for scraping modules
@@ -12,8 +16,9 @@ def get_soup(url, to=10):
     args:
     url (String): URL to parse
     to (Num): Time before timeout in seconds
+    ver (Bool): Skips certificate verification when set to False
     """
-    r = requests.get(url, timeout=to)
+    r = requests.get(url, timeout=to, verify=ver)
     r.raise_for_status()
     return BeautifulSoup(r.text, 'html.parser')
 
