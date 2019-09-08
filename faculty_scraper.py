@@ -13,13 +13,16 @@ class FacultyScraper:
         self.firebase_proxy = firebase_proxy
 
         self.COLLECTION = "Scraped"
-        self.DOCUMENT_TYPE = "professor"
-        self.REST_TIME = 250  # Time between requests in ms
+        self.DOCUMENT_TYPE = "faculty_member"
+        self.REST_TIME = 100  # Time between requests in ms
 
     def parse_single_employee(self, url):
         """ Scrapes data from a single Cal Poly employee """
 
-        soup = scraper.get_soup(url)
+        # Due to certificate issues with CSC employee pages, verification
+        # is turned off for requests in the scraper module. This leads to
+        # lots of warning during runtime but unaffected data.
+        soup = scraper.get_soup(url, ver=False)
 
         name = soup.find('h1').text
         office = email = phone = 'NA'  # Default values, assuming we don't find any on the page
@@ -119,7 +122,8 @@ class FacultyScraper:
 
         # CSC employees
         csc_top_link = 'https://csc.calpoly.edu/faculty/'
-        csc_top = scraper.get_soup(csc_top_link)
+        # Verification turned off; read main note in self.parse_single_employee
+        csc_top = scraper.get_soup(csc_top_link, ver=False)
         for link in csc_top.find_all('a', href=True):
             nav = link['href']
             if (nav.startswith('/faculty/') or nav.startswith('/staff')) and (nav != '/faculty/' and nav != '/staff/'):
@@ -128,3 +132,22 @@ class FacultyScraper:
                 sleep(self.REST_TIME / 1000)
 
         return firebase_transactions
+
+
+if __name__ == '__main__':
+    faculty = FacultyScraper(scraper.blank_proxy).scrape(no_upload=True)
+    for f in faculty:
+        print(f.document_name)
+        for key, value in f.document.items():
+            if key == 'office_hours':
+                print('\toffice_hours:')
+                if value == 'NA':
+                    print('\t\tNA')
+                    break
+                for key2, value2 in value.items():
+                    print(f'\t\t{key2}')
+                    for key3, value3 in value2.items():
+                        print(f'\t\t\t{key3}: {value3}')
+            else:
+                print(f'\t{key}: {value}')
+        print()
