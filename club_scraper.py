@@ -25,7 +25,7 @@ class ClubScraper:
         firebase_transactions ([Transaction]): A list of Transactions with
             data for each club
         """
-        top = scraper.get_soup(self.TOP_LINK)
+        top = scraper.get_soup(self.TOP_LINK, to=20)
         raw = [l.text.strip()
                for l in top.find_all('span')]
         info = [x for x in raw
@@ -94,3 +94,12 @@ class ClubScraper:
                 i += 1
 
         return firebase_transactions
+
+
+if __name__ == '__main__':
+    clubs = ClubScraper(scraper.blank_proxy).scrape(no_upload=True)
+    for c in clubs:
+        print(c.document_name)
+        for key, value in c.document.items():
+            print(f'\t{key}: {value}')
+        print()
