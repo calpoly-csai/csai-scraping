@@ -53,6 +53,9 @@ csv = s.scrape()
 * Faculty contact information (office, phone, email)
 * Professor research interests
 
+## Architecture
+![Nimbus Scraping Architecture](https://i.imgur.com/ongMSm6.png)
+
 ## TODO
 
 - [ ] Integrate scrapers into Nimbus API
