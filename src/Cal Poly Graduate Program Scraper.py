@@ -48,7 +48,7 @@ def scrape_program_courses(url):
         dataframe = pd.read_html(str(table))
         return tabulate(dataframe[0], headers='keys', tablefmt='psql')
     except:
-        return "There was no table on this page"
+        return "No table on this page"
 
 
 
