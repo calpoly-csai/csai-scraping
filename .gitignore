@@ -4,3 +4,9 @@
 __pycache__/
 
 cred_path
+
+csai_scraping.iml
+
+src/__pycache__/
+
+.DS_Store
