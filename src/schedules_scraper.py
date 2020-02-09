@@ -8,6 +8,8 @@ Description: Scrapes class and professor data from the Cal Poly schedules site
 
 import pandas as pd
 import scraper_base
+import requests
+from barometer import barometer, SUCCESS, ALERT, INFO, DEBUG
 
 class SchedulesScraper:
 
@@ -30,6 +32,7 @@ class SchedulesScraper:
         returns:
             A list of sub-tables (or the original table if there are none)
         """
+        print(DEBUG, f"Calling separate_dfs: add_name={add_name}")
 
         # name_df : DataFrame -> str -> None
         def name_df(d, s):
@@ -41,6 +44,7 @@ class SchedulesScraper:
 
         # If there's no separation or MultiIndex, return original df
         if len(indicies) == 0 or type(df.columns) != pd.core.indexes.multi.MultiIndex:
+            print(DEBUG, f"No sub-dfs. Returning original.")
             return [df]
         else:
             # Find which header is all the same value (sub-table identifying header)
@@ -48,6 +52,7 @@ class SchedulesScraper:
             header_two = [b for a,b in df.columns]
             if len(set(header_one)) == 1:
                 if len(set(header_two)) == 1:
+                    print(ERR, "MultiIndex with no multi-valued headers")
                     raise ValueError('MultiIndex with no multi-valued headers')
                 else:
                     df_name = header_one[0]
@@ -56,17 +61,23 @@ class SchedulesScraper:
                 df_name = header_two[0]
                 df.columns = header_one
             else:
+                print(ERR, "MultiIndex with multiple multi-valued headers")
                 raise ValueError('MultiIndex with multiple multi-valued headers')
+            print(DEBUG, "Found sub-table identifying header")
 
             prev_index = -1
             dfs = []
+            num_processed_dfs = 0
             for i in indicies + [len(df)]:
+                num_processed_dfs += 1
                 sub_df = df.iloc[prev_index+1:i,:].reset_index(drop=True)
                 name_df(sub_df, df_name)
                 df_name = df.iloc[i%len(df),:][0]
+                print(DEBUG, f"Found sub-df {df_name} from indicies {prev_index + 1} to {i}")
                 dfs.append(sub_df)
                 prev_index = i
 
+        print(DEBUG, f"Separated df into {len(dfs)} sub-dfs")
         return dfs
 
 
@@ -80,10 +91,12 @@ class SchedulesScraper:
         returns:
             A processed DataFrame
         """
+        print(DEBUG, f"Calling preprocess_schedules: df={df.name}")
         # Remove extraneous "Unnamed*" columns introduced by Pandas
         df.dropna(axis='columns', how='all', inplace=True)
         # If first row is the same as the header, drop it
         if all(df.iloc[0,:] == df.columns):
+            print(DEBUG, "First row is the same as the header. Dropping it.")
             df.drop(0, inplace=True)
             df.reset_index(drop=True, inplace=True)
 
@@ -102,6 +115,7 @@ class SchedulesScraper:
         df.drop('Sect', axis='columns', inplace=True)
 
         if 'Office Hours' in df:
+            print(DEBUG, "Found office hours column. Dropping it.")
             df.drop('Office Hours', axis='columns', inplace=True)
 
         # Make column headings uppercase
@@ -121,17 +135,27 @@ class SchedulesScraper:
         returns:
             A list of scraped DataFrames
         """
+        print(DEBUG, f"Calling scrape_schedules_from_html: preprocess={preprocess}")
         dfs = pd.read_html(html)
+        if not dfs:
+            print(ALERT, "Didn't find any tables on page. Aborting scrape.")
+            return None
+        print(INFO, f"Found {len(dfs)} table(s)")
         separated = []
         for df in dfs:
             separated.extend(self.separate_dfs(df, add_name=True))
+        print(INFO, f"Split {len(dfs)} df(s) into {len(separated)} sub-df(s)")
         if preprocess is not None:
             separated = [preprocess(d) for d in separated]
-
         return separated
 
     def scrape_schedules_from_url(self, url, verify=True, preprocess=None):
-        soup = scraper_base.get_soup(url, verify)
+        try:
+            soup = scraper_base.get_soup(url, verify)
+        except requests.exceptions.RequestException as e:
+            print(ALERT, e)
+            return None
+        print(SUCCESS, "Retrieved schedules page")
         return self.scrape_schedules_from_html(str(soup), preprocess)
 
     def scrape_schedules_from_file(self, path, preprocess=None):
@@ -139,6 +163,7 @@ class SchedulesScraper:
             text = f.read()
         return self.scrape_schedules_from_html(text, preprocess)
 
+    @barometer
     def scrape(self):
         """
         Scrapes data from schedules.calpoly.edu to CSV
@@ -146,7 +171,10 @@ class SchedulesScraper:
         returns:
             A CSV string of scraped data
         """
+        print(INFO, f"Starting scrape on {self.TOP_LINK}")
         dfs = self.scrape_schedules_from_url(self.TOP_LINK, preprocess=self.preprocess_schedules)
         all_em = pd.concat(dfs)
-        return all_em.to_csv(None)
+        print(SUCCESS, f"Done! Scraped {len(all_em)} sections")
+        csv_str = all_em.to_csv(None)
+        return csv_str
 

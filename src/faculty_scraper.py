@@ -79,7 +79,7 @@ class FacultyScraper:
             if found_office and found_phone and found_email:
                 break
 
-        office_hours = dict()
+        # office_hours = dict()
 
         # Office hour parsing is currently disabled. The previous solution only worked for the CPE department
         # and stored office hours in a dictionary, which is not represented in a CSV file. A separate source
