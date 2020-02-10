@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 
 
 # TODO: Add support for user agent headers
-def get_soup(url, ver=True):
+def get_soup(url, ver=True, to=30):
     """
     Turns a URL into a parsed BeautifulSoup object and
     raises exceptions for scraping modules
@@ -19,8 +19,9 @@ def get_soup(url, ver=True):
     args:
         url (str): URL to parse
         ver (bool): Skips certificate verification when set to False
+        to (num): Number of seconds until request timeout
     """
-    r = requests.get(url, verify=ver)
+    r = requests.get(url, verify=ver, timeout=to)
     r.raise_for_status()
     # lxml used for speed
     return BeautifulSoup(r.text, 'lxml')

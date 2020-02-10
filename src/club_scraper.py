@@ -7,7 +7,9 @@ Description: Scrapes club data from the Cal Poly website
 """
 
 import scraper_base
+import requests
 import pandas as pd
+from barometer import barometer, SUCCESS, ALERT, INFO, DEBUG
 
 
 class ClubScraper:
@@ -28,6 +30,7 @@ class ClubScraper:
             'Description:': 'DESCRIPTION'
         }
 
+    @barometer
     def scrape(self):
         """
         Scrapes club information to CSV
@@ -35,7 +38,13 @@ class ClubScraper:
         returns:
             str: A CSV string of scraped data
         """
-        top = scraper_base.get_soup(self.TOP_LINK)
+        print(INFO, f'Starting scrape on {self.TOP_LINK}')
+        try:
+            top = scraper_base.get_soup(self.TOP_LINK)
+        except requests.exceptions.RequestException as e:
+            print(ALERT, e)
+            return None
+        print(SUCCESS, f'Retrieved club list')
         raw = [l.text.strip() for l in top.find_all('span')]
         # Filters out some info we don't need
         info = [x for x in raw if x and x != "Website" and x != "Homepage:"]
@@ -83,8 +92,12 @@ class ClubScraper:
                 if current_club and len(club_info) != 0:
                     club_info['NAME'] = current_club
                     scraped_clubs.append(club_info)
+                    print(DEBUG, f'Scraped {current_club}')
+                else:
+                    print(DEBUG, f'Discarding non-club {current_club}')
                 club_info = dict()
                 current_club = line
                 i += 1
 
+        print(SUCCESS, f'Done! Scraped {len(scraped_clubs)} clubs')
         return pd.DataFrame(scraped_clubs).to_csv(None, index=False)

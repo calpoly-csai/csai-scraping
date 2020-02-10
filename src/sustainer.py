@@ -10,11 +10,13 @@ from calendar_scraper import CalendarScraper
 from club_scraper import ClubScraper
 from course_scraper import CourseScraper
 from schedules_scraper import SchedulesScraper
+from location_scraper import LocationScraper
 
+import datetime
 import json
 
 
-def scrape_all():
+def scrape_all(filename, log_level=8, verbosity=8):
     """
     Runs all scrapers
 
@@ -22,12 +24,15 @@ def scrape_all():
         str: A json string containing the data from each scraper
     """
     data = dict()
-    data['calendar_data'] = CalendarScraper().scrape()
-    data['club_scraper'] = ClubScraper().scrape()
-    data['course_scraper'] = CourseScraper().scrape()
-    data['schedules_scraper'] = SchedulesScraper().scrape()
+    data['calendar_data'] = CalendarScraper().scrape(logfile=filename, log_level=log_level, verbosity=verbosity)
+    data['club_scraper'] = ClubScraper().scrape(logfile=filename, log_level=log_level, verbosity=verbosity)
+    data['course_scraper'] = CourseScraper().scrape(logfile=filename, log_level=log_level, verbosity=verbosity)
+    data['schedules_scraper'] = SchedulesScraper().scrape(logfile=filename, log_level=log_level, verbosity=verbosity)
+    data['location_scraper'] = LocationScraper().scrape(logfile=filename, log_level=log_level, verbosity=verbosity)
     return json.dumps(data)
 
 
 if __name__=='__main__':
-    scrape_all()
+    now = datetime.datetime.now()
+    filename = now.strftime("%Y-%m-%d")
+    scrape_all(filename)

@@ -7,9 +7,10 @@ Description: Scrapes calendar data from the main Cal Poly academic calendar
 """
 
 import scraper_base
-import requests # needed for HTTPError, even with scraper_base
+import requests
 import calendar as cal
 import pandas as pd
+from barometer import barometer, SUCCESS, ALERT, INFO, DEBUG, NOTICE, ERR
 
 
 class CalendarScraper:
@@ -77,6 +78,7 @@ class CalendarScraper:
         """
         return f'{self.months.index(month)}_{day}_{year}'
 
+    @barometer
     def scrape(self):
         """
         Scrapes academic calendar data to CSV
@@ -84,6 +86,7 @@ class CalendarScraper:
         returns:
             str: A CSV string of scraped data
         """
+        print(DEBUG, f"Starting calendar scrape: CALENDAR_EPOCH={self.CALENDAR_EPOCH}, TOP_LINK={self.TOP_LINK}")
         starting_year = self.CALENDAR_EPOCH
         calendar = dict()
 
@@ -91,14 +94,24 @@ class CalendarScraper:
             ending_year = starting_year + 1
             current_year = starting_year
             calendar_url = f'{self.TOP_LINK}/{starting_year}-{ending_year - 2000}-academic-calendar'
-
+            print(DEBUG, f"Attempting to retrieve {starting_year}-{ending_year} calendar from {calendar_url}")
             try:
                 calendar_soup = scraper_base.get_soup(calendar_url)
             # Returns on an invalid school year; should always return.
             except requests.exceptions.HTTPError:
+                print(NOTICE, f"{starting_year}-{ending_year} calendar doesn't exist. Ending scrape.")
                 dates = list(calendar.values())
+                if len(dates) > 0:
+                    print(SUCCESS, f"Done! Scraped {ending_year-self.CALENDAR_EPOCH-1} calendar(s)")
+                else:
+                    print(ERR, "Did not successfully scrape any dates")
+                    return None
                 return pd.DataFrame(dates).to_csv(None, index=False)
+            except requests.exceptions.RequestException as e:
+                print(ALERT, e)
+                return None
             else:
+                print(SUCCESS, f"Successfully retrieved {starting_year}-{ending_year} calendar")
                 # Finds all tables on the page (summer/fall/winter/spring quarters)
                 # Excludes the last summary table.
                 # Note: summary table id has a space at the end. All years are like this.
@@ -106,7 +119,7 @@ class CalendarScraper:
                                                 tag.name == 'table'
                                                 and tag.has_attr('id')
                                                 and tag['id'] != "SUMMARY OF CALENDAR DAYS ")
-
+                print(DEBUG, f"Found {len(tables)} tables")
                 for table in tables:
                     for row in table.find_all('tr'):
                         cols = row.find_all('td')
@@ -115,6 +128,7 @@ class CalendarScraper:
                         # Ugly solution to change the calendar year during the school year.
                         # Assumes there will always be an event in January.
                         if 'January' in parsed_dates and current_year != ending_year:
+                            print(DEBUG, f"Switching current year from {current_year} to {ending_year}")
                             current_year = ending_year
                         # Second column is just the days of the week; ignore
                         events = [t.strip() for t in cols[2].text.splitlines()]
