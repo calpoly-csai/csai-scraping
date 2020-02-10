@@ -58,11 +58,11 @@ csv = s.scrape()
 
 ## TODO
 
-- [ ] Integrate scrapers into Nimbus API
 - [ ] Add reporting when website format changes are detected
-- [ ] Add GE areas to course_scraper
+- [x] Add GE areas to course_scraper
 - [ ] Create degree program scraper ([catalog.calpoly.edu/programsaz/](http://catalog.calpoly.edu/programsaz/))
 - [ ] Integrate more calendars into calendar_scraper
+- [x] Add logging
 
 ## Contributing
 Feel free to make pull requests or report issues. For major changes, please open an issue first to discuss. Also, check out onboarding.txt (coming soon)
