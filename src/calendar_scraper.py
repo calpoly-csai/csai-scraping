@@ -136,8 +136,10 @@ class CalendarScraper:
                             for day in days:
                                 date = self.make_date(month, day, current_year)
                                 if date in calendar:
+                                    print(DEBUG, f"Adding event to {date}")
                                     calendar[date]['EVENTS'].extend(events)
                                 else:
+                                    print(DEBUG, f"Making calendar entry for {date}")
                                     entry = dict()
                                     entry['DATE'] = date
                                     entry['DAY'] = day

@@ -34,5 +34,7 @@ def scrape_all(filename, log_level=8, verbosity=8):
 
 if __name__=='__main__':
     now = datetime.datetime.now()
-    filename = now.strftime("%Y-%m-%d")
-    scrape_all(filename)
+    filename = f'{now.strftime("%Y-%m-%d")}.txt'
+    data = scrape_all(filename)
+    with open('data.json', 'w') as d:
+        d.write(data)

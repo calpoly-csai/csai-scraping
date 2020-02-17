@@ -9,7 +9,8 @@ Description: Scrapes class and professor data from the Cal Poly schedules site
 import pandas as pd
 import scraper_base
 import requests
-from barometer import barometer, SUCCESS, ALERT, INFO, DEBUG
+from barometer import barometer, SUCCESS, ALERT, INFO, DEBUG, ERR
+
 
 class SchedulesScraper:
 
@@ -175,6 +176,6 @@ class SchedulesScraper:
         dfs = self.scrape_schedules_from_url(self.TOP_LINK, preprocess=self.preprocess_schedules)
         all_em = pd.concat(dfs)
         print(SUCCESS, f"Done! Scraped {len(all_em)} sections")
-        csv_str = all_em.to_csv(None)
+        csv_str = all_em.to_csv(None, index=False)
         return csv_str
 
