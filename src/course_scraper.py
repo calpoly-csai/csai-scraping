@@ -168,5 +168,3 @@ class CourseScraper:
                 scraped_courses.append(document)
         print(SUCCESS, f"Done! Scraped {len(scraped_courses)} courses")
         return pd.DataFrame(scraped_courses).to_csv(None, index=False)
-
-

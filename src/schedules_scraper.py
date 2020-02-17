@@ -178,4 +178,3 @@ class SchedulesScraper:
         print(SUCCESS, f"Done! Scraped {len(all_em)} sections")
         csv_str = all_em.to_csv(None, index=False)
         return csv_str
-

@@ -170,5 +170,3 @@ class PlacemarkHandler(xml.sax.handler.ContentHandler):
             else:
                 self.mapping[self.name_tag][name] = self.buffer
         self.buffer = ""
-
-LocationScraper().scrape(verbosity=8)
