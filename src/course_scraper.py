@@ -5,7 +5,7 @@ Date: 1/22/2020
 Organization: Cal Poly CSAI
 Description: Scrapes course data from the Cal Poly website
 """
-
+import json
 import requests
 from barometer import barometer, SUCCESS, ALERT, INFO, DEBUG
 import scraper_base
@@ -18,6 +18,22 @@ class CourseScraper:
 
     def __init__(self):
         self.REST_TIME = 100
+
+    @staticmethod
+    def transform_course_to_db(course: dict):
+        db_course = {
+            'courseId': "{} {}".format(course['DEPARTMENT'], course['COURSE_NUM']),
+            'dept': course['DEPARTMENT'],
+            'courseNum': course['COURSE_NUM'],
+            'courseName': course['COURSE_NAME'],
+            'units': course['UNITS'],
+            'raw_prerequisites_text': course['PREREQUISITES'],
+            'raw_concurrent_text': course['CONCURRENT'],
+            'raw_recommended_text': course['RECOMMENDED'],
+            'termsOffered': course['TERMS_TYPICALLY_OFFERED'],
+        }
+
+        return db_course
 
     @barometer
     def scrape(self, all_departments=False):
@@ -75,8 +91,11 @@ class CourseScraper:
             courses = dep_soup.findAll("div", {"class": "courseblock"})
             print(DEBUG, f"Found {len(courses)} courses")
             for course in courses:
-                course_name_and_units = (course.find("p", {"class": "courseblocktitle"})).get_text()
-                course_name, course_units = course_name_and_units.splitlines()
+                course_name_and_units = (course.find ("p", {"class": "courseblocktitle"})).get_text()
+                full_course_name, course_units = course_name_and_units.splitlines()
+                full_course_name_split = full_course_name.split('. ', 1)
+                course_num = full_course_name_split[0].split('\xa0')[1]
+                course_name = full_course_name_split[1]
                 print(DEBUG, f"Found {course_name}")
                 course_units = course_units.split(' ', 1)[0]
                 paragraphs = course.findAll('p')
@@ -149,8 +168,15 @@ class CourseScraper:
                 course_terms = maybe_join(course_terms)
                 ge_areas = maybe_join(ge_areas)
 
+                new_terms = []
+                for term in course_terms:
+                    new_terms.extend(term.split(','))
+                course_terms = [term for term in new_terms if len(term) > 0]
+                print(course_terms)
+
                 document = {
                     "DEPARTMENT": dep_name,
+                    "COURSE_NUM": course_num,
                     "COURSE_NAME": course_name,
                     "UNITS": course_units,
                     "PREREQUISITES": course_prereqs,
@@ -162,6 +188,14 @@ class CourseScraper:
                 }
 
                 scraped_courses.append(document)
+
         print(SUCCESS, f"Done! Scraped {len(scraped_courses)} courses")
+
+        courses_request = json.dumps({
+            'courses': [self.transform_course_to_db(course) for course in scraped_courses]
+        })
+        requests.post(url='http://0.0.0.0:8080/new_data/courses',
+                      json=courses_request)
+
         return pd.DataFrame(scraped_courses).to_csv(None, index=False)
 
