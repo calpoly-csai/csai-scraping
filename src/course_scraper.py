@@ -18,11 +18,11 @@ class CourseScraper:
 
     def __init__(self):
         self.REST_TIME = 100
+        self.COURSES_API = 'http://0.0.0.0:8080/new_data/courses'
 
     @staticmethod
     def transform_course_to_db(course: dict):
         db_course = {
-            'courseId': "{} {}".format(course['DEPARTMENT'], course['COURSE_NUM']),
             'dept': course['DEPARTMENT'],
             'courseNum': course['COURSE_NUM'],
             'courseName': course['COURSE_NAME'],
@@ -168,11 +168,8 @@ class CourseScraper:
                 course_terms = maybe_join(course_terms)
                 ge_areas = maybe_join(ge_areas)
 
-                new_terms = []
-                for term in course_terms:
-                    new_terms.extend(term.split(','))
-                course_terms = [term for term in new_terms if len(term) > 0]
-                print(course_terms)
+                course_terms = [term for term in course_terms.split(',')
+                                if len(term) > 0]
 
                 document = {
                     "DEPARTMENT": dep_name,
@@ -192,9 +189,10 @@ class CourseScraper:
         print(SUCCESS, f"Done! Scraped {len(scraped_courses)} courses")
 
         courses_request = json.dumps({
-            'courses': [self.transform_course_to_db(course) for course in scraped_courses]
+            'courses': [self.transform_course_to_db(course)
+                        for course in scraped_courses]
         })
-        requests.post(url='http://0.0.0.0:8080/new_data/courses',
+        requests.post(url=self.COURSES_API,
                       json=courses_request)
 
         return pd.DataFrame(scraped_courses).to_csv(None, index=False)
