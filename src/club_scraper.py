@@ -5,6 +5,7 @@ Date: 1/22/2020
 Organization: Cal Poly CSAI
 Description: Scrapes club data from the Cal Poly website
 """
+import json
 
 import scraper_base
 import requests
@@ -15,6 +16,7 @@ from barometer import barometer, SUCCESS, ALERT, INFO, DEBUG
 class ClubScraper:
 
     def __init__(self):
+        self.CLUBS_API = 'http://0.0.0.0:8080/new_data/clubs'
         self.TOP_LINK = 'https://www.asi.calpoly.edu/club_directories/listing_bs/'
         # Doesn't contain 'Contact Email' because that name is used for two different fields.
         # Workaround in scrape method.
@@ -29,6 +31,23 @@ class ClubScraper:
             'Type(s):': 'TYPES',
             'Description:': 'DESCRIPTION'
         }
+
+    @staticmethod
+    def transform_club_to_db(club: dict):
+        db_club = {
+            'club_name': club['NAME'],
+            'types': club['TYPES'],
+            'desc': club['DESCRIPTION'],
+            'contact_email': club['CONTACT_EMAIL'],
+            'contact_email_2': club['CONTACT_EMAIL_2'],
+            'contact_person': club['CONTACT_PERSON'],
+            'contact_phone': club['CONTACT_PHONE'],
+            'box': club['BOX'],
+            'advisor': club['ADVISOR'],
+            'affiliation': club['AFFILIATION'],
+        }
+
+        return db_club
 
     @barometer
     def scrape(self):
@@ -98,6 +117,13 @@ class ClubScraper:
                 club_info = dict()
                 current_club = line
                 i += 1
+
+        clubs_request = json.dumps({
+            'clubs': [self.transform_club_to_db(club)
+                      for club in scraped_clubs]
+        })
+        requests.post(url=self.CLUBS_API,
+                      json=clubs_request)
 
         print(SUCCESS, f'Done! Scraped {len(scraped_clubs)} clubs')
         return pd.DataFrame(scraped_clubs).to_csv(None, index=False)
