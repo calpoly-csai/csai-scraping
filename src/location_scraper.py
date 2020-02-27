@@ -81,9 +81,20 @@ class LocationScraper:
         except Exception as e:
             print(ERR, f"Failed to parse .kml file: {e}")
         archive.close()
-        return self.build_table(handler.mapping)
 
-    def build_table(self, mapping):
+        output = self.build_table(handler.mapping)
+
+        locations_request = json.dumps({
+            'locations': [self.transform_location_to_db(location)
+                          for location in output.split('\n')[1:-1]]
+        })
+        requests.post(url=self.LOCATIONS_API,
+                      json=locations_request)
+
+        return output
+
+    @staticmethod
+    def build_table(mapping):
         """
         Creates a CSV string from a dict containing .kmz data
 
@@ -120,14 +131,6 @@ class LocationScraper:
             else: #shapes
                 shapes += stem
         output += f'{points}{lines}{shapes}'
-
-        locations_request = json.dumps({
-            'locations': [self.transform_location_to_db(location)
-                          for location in output.split('\n')[1:-1]]
-                          # if len(location.split(',')) == 4]
-        })
-        requests.post(url=self.LOCATIONS_API,
-                      json=locations_request)
 
         print(SUCCESS, f"Done! Scraped {len(output.splitlines())} locations")
         return output
