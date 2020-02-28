@@ -27,13 +27,15 @@ class CourseScraper:
     def transform_course_to_db(course: dict):
         db_course = {
             'dept': course['DEPARTMENT'],
-            'courseNum': course['COURSE_NUM'],
-            'courseName': course['COURSE_NAME'],
+            'course_num': course['COURSE_NUM'],
+            'course_name': course['COURSE_NAME'],
             'units': course['UNITS'],
             'raw_prerequisites_text': course['PREREQUISITES'],
             'raw_concurrent_text': course['CONCURRENT'],
             'raw_recommended_text': course['RECOMMENDED'],
-            'termsOffered': course['TERMS_TYPICALLY_OFFERED'],
+            'terms_offered': course['TERMS_TYPICALLY_OFFERED'],
+            'ge_areas': course['GE_AREAS'],
+            'desc': course['COURSE_DESC']
         }
 
         return db_course
