@@ -5,6 +5,7 @@ Date: 1/22/2020
 Organization: Cal Poly CSAI
 Description: Scrapes calendar data from the main Cal Poly academic calendar
 """
+import json
 
 import scraper_base
 import requests
@@ -16,6 +17,7 @@ from barometer import barometer, SUCCESS, ALERT, INFO, DEBUG, NOTICE, ERR
 class CalendarScraper:
 
     def __init__(self):
+        self.CALENDARS_API = 'http://0.0.0.0:8080/new_data/calendars'
         self.CALENDAR_EPOCH = 2018
         self.TOP_LINK = 'https://registrar.calpoly.edu'
         self.months = list(cal.month_name)
@@ -149,3 +151,22 @@ class CalendarScraper:
                                     calendar[date] = entry
 
                 starting_year += 1
+
+            scraped_calendar_entries = []
+            for date, full_entry in calendar.items():
+                for event in full_entry['EVENTS']:
+                    scraped_calendar_entries.append(
+                        {
+                            'date': full_entry['DATE'],
+                            'day': full_entry['DAY'],
+                            'month': full_entry['MONTH'],
+                            'year': full_entry['YEAR'],
+                            'raw_events_text': event,
+                        }
+                    )
+
+            calendars_request = json.dumps({
+                'calendars': scraped_calendar_entries
+            })
+            requests.post(url=self.CALENDARS_API,
+                          json=calendars_request)

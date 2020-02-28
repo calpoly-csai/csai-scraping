@@ -5,6 +5,7 @@ Date: 2/3/2020
 Organization: Cal Poly CSAI
 Description: Downloads Cal Poly map data in .kmz format and converts it to CSV
 """
+import json
 
 import requests
 from zipfile import ZipFile
@@ -16,7 +17,20 @@ from barometer import barometer, SUCCESS, ALERT, INFO, DEBUG, ERR
 class LocationScraper:
 
     def __init__(self):
+        self.LOCATIONS_API = 'http://0.0.0.0:8080/new_data/locations'
         self.TOP_LINK = 'https://afd.calpoly.edu/facilities/campus-maps/docs/Cal_Poly_Buildings.kmz'
+
+    @staticmethod
+    def transform_location_to_db(location: str):
+        loc_split = location.split(',')
+        db_location = {
+            'building_number': loc_split[0],
+            'name': loc_split[1],
+            'longitude': loc_split[2],
+            'latitude': loc_split[3],
+        }
+
+        return db_location
 
     @barometer
     def scrape(self):
@@ -67,7 +81,17 @@ class LocationScraper:
         except Exception as e:
             print(ERR, f"Failed to parse .kml file: {e}")
         archive.close()
-        return self.build_table(handler.mapping)
+
+        output = self.build_table(handler.mapping)
+
+        locations_request = json.dumps({
+            'locations': [self.transform_location_to_db(location)
+                          for location in output.split('\n')[1:-1]]
+        })
+        requests.post(url=self.LOCATIONS_API,
+                      json=locations_request)
+
+        return output
 
     @staticmethod
     def build_table(mapping):
@@ -107,6 +131,7 @@ class LocationScraper:
             else: #shapes
                 shapes += stem
         output += f'{points}{lines}{shapes}'
+
         print(SUCCESS, f"Done! Scraped {len(output.splitlines())} locations")
         return output
 
