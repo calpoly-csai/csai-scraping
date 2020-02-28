@@ -5,6 +5,9 @@ Date: 1/22/2020
 Organization: Cal Poly CSAI
 Description: Scrapes course data from the Cal Poly website
 """
+
+# Added course descriptions
+
 import json
 import requests
 from barometer import barometer, SUCCESS, ALERT, INFO, DEBUG
@@ -24,13 +27,15 @@ class CourseScraper:
     def transform_course_to_db(course: dict):
         db_course = {
             'dept': course['DEPARTMENT'],
-            'courseNum': course['COURSE_NUM'],
-            'courseName': course['COURSE_NAME'],
+            'course_num': course['COURSE_NUM'],
+            'course_name': course['COURSE_NAME'],
             'units': course['UNITS'],
             'raw_prerequisites_text': course['PREREQUISITES'],
             'raw_concurrent_text': course['CONCURRENT'],
             'raw_recommended_text': course['RECOMMENDED'],
-            'termsOffered': course['TERMS_TYPICALLY_OFFERED'],
+            'terms_offered': course['TERMS_TYPICALLY_OFFERED'],
+            'ge_areas': course['GE_AREAS'],
+            'desc': course['COURSE_DESC']
         }
 
         return db_course
@@ -103,6 +108,7 @@ class CourseScraper:
                     ge_areas = re.findall(r'Area (\w+)', paragraphs[1].text)
                 else:
                     ge_areas = None
+                course_desc = paragraphs[-1].text
                 course_terms_and_reqs = (course.find("div", {"class": "noindent courseextendedwrap"})).get_text()
 
                 section = None
@@ -181,7 +187,8 @@ class CourseScraper:
                     "CONCURRENT": course_conc,
                     "RECOMMENDED": course_rec,
                     "TERMS_TYPICALLY_OFFERED": course_terms,
-                    "GE_AREAS": ge_areas
+                    "GE_AREAS": ge_areas,
+                    "COURSE_DESC": course_desc
                 }
 
                 scraped_courses.append(document)
@@ -196,4 +203,3 @@ class CourseScraper:
                       json=courses_request)
 
         return pd.DataFrame(scraped_courses).to_csv(None, index=False)
-

@@ -58,11 +58,11 @@ EMERG_CODE = f'\033[1;31m{EMERG_ICON} '
 ALERT_CODE = f'\033[1;31m{ALERT_ICON} '
 CRIT_CODE = f'\033[1:31m{CRIT_ICON} '
 ERR_CODE = f'\033[1;31m{ERR_ICON}\033[0m '
-WARNING_CODE = f'\033[1;33m{WARNING_ICON}\033[0m '
-NOTICE_CODE = f'\033[1;34m{NOTICE_ICON}\033[0m '
-INFO_CODE = f'\033[1;30m{INFO_ICON}\033[0m '
-DEBUG_CODE = f'\033[1m{DEBUG_ICON}\033[0m '
-SUCCESS_CODE = f'\033[1;32m{SUCCESS_ICON}\033[0m '
+WARNING_CODE = f'\033[0m\033[1;33m{WARNING_ICON}\033[0m '
+NOTICE_CODE = f'\033[0m\033[1;34m{NOTICE_ICON}\033[0m '
+INFO_CODE = f'\033[0m\033[1;30m{INFO_ICON}\033[0m '
+DEBUG_CODE = f'\033[0m\033[1m{DEBUG_ICON}\033[0m '
+SUCCESS_CODE = f'\033[0m\033[1;32m{SUCCESS_ICON}\033[0m '
 NO_LOG_CODE = f'\033[0m'
 
 EMERG = MessageType('EMERG', EMERG_ID, EMERG_CODE, EMERG_MSG_LEVEL, EMERG_ICON)
@@ -223,9 +223,9 @@ class barometer(object):
                     result = self.wrapped(**kwargs)
                 else:
                     result = self.wrapped()
-        except Exception as e:
-
-            print(ALERT, f"Unhandled exception: {e}")
+        except:
+            tb = traceback.format_exc()
+            print(ALERT, f"Unhandled exception!\n{tb}")
         finally:
             if log_level is not None and log_level is not False:
                 # dumps contents of log buffer to "data"
