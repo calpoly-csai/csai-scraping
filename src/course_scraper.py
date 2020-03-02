@@ -165,14 +165,13 @@ class CourseScraper:
                         else:
                             pass
 
-                # Update: Now joined with a comma
-                maybe_join = (lambda x: ','.join(x) if x else 'NA')
-                course_prereqs = maybe_join(course_prereqs)
-                course_coreqs = maybe_join(course_coreqs)
-                course_conc = maybe_join(course_conc)
-                course_rec = maybe_join(course_rec)
-                course_terms = maybe_join(course_terms)
-                ge_areas = maybe_join(ge_areas)
+                maybe_join = (lambda x, j: j.join(x) if x else 'NA')
+                course_prereqs = maybe_join(course_prereqs, ' ')
+                course_coreqs = maybe_join(course_coreqs, ' ')
+                course_conc = maybe_join(course_conc, ' ')
+                course_rec = maybe_join(course_rec, ' ')
+                course_terms = maybe_join(course_terms, ', ')
+                ge_areas = maybe_join(ge_areas, ', ')
 
                 course_terms = [term for term in course_terms.split(',')
                                 if len(term) > 0]
