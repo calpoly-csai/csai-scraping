@@ -1,0 +1,84 @@
+,NAME,OFFICE,EMAIL,PHONE,RESEARCH_INTERESTS
+0,Chris Lupo,14-254,clupo@calpoly.edu,805-756-5659,"['Applied Parallel Computing', 'Computer Architecture', 'GPU Computing', 'High Performance Computing']"
+1,Paul Anderson,14-222,pander14@calpoly.edu,,"['Bioinformatics', 'Data Science', 'Genomics', 'Machine Learning', 'Metabolomics', 'Proteomics']"
+2,Hisham Assal,14-240,hhassal@calpoly.edu,805-756-1330,
+3,John Bellardo,14-235D,bellardo@calpoly.edu,805-756-7256,"['Distributed Systems', 'Networks', 'Operating Systems', 'Wireless Networks']"
+4,John Clements,14-208,clements@calpoly.edu,805-756-6528,"['Computational Finance', 'Computer Music', 'Dynamic & Scripting languages', 'Macros & Hygiene', 'Password Generation', 'Programming Environments', 'Programming Languages', 'Programming Language Semantics']"
+5,Bruno da Silva,14-223,bcdasilv@calpoly.edu,805-756-5541,"['Empirical Software Engineering', 'Mining Software Repositories', 'Program Comprehension', 'Software Analytics', 'Software Maintenance and Evolution', 'Software Metrics']"
+6,Bruce DeBruhl,14-214,bdebruhl@calpoly.edu,805-756-1392,"['Automotive security', 'Cyber-physical security', 'Privacy in Technology', 'Wireless Systems']"
+7,Alex Dekhtyar,14-210,dekhtyar@calpoly.edu,805-756-2387,"['Bioinformatics', 'Databases', 'Digital Libraries', 'Independent Verification and Validation of Software', 'Information Retrieval and Data Mining', 'Management of XML data', 'Uncertain Reasoning in AI and Logic Programming']"
+8,Christian Eckhardt,14-221,ceckhard@calpoly.edu,805-756-2416,"['Animation and Motion Capturing', 'Game Design and Development', 'Global Illumination', 'HCI', 'Machine Learning', 'Physics Simulation', 'Procedural Generation']"
+9,Sussan Einakian,14-202,seinakia@calpoly.edu,805-756-7186,
+10,Davide Falessi,14-229,dfalessi@calpoly.edu,805-756-2344,"['Machine Learning applied to Software Engineering', 'Software Change Prediction', 'Software Defect Prediction', 'Software Engineering Recommendation Systems']"
+11,Phoenix (Dongfeng) Fang,14-207,dofang@calpoly.edu,,"['Cybersecurity - 5G Security', 'Cybersecurity - Critical Infrastructure Security', 'Cybersecurity - Cyber-Physical Security', 'Cybersecurity - IoT security', 'Cybersecurity - Wireless Security', 'Privacy of Network Communications', 'Public Safety Communications', 'Wireless Communications and Networks']"
+12,Sara Ford,,ssford@calpoly.edu,,
+13,Kris Fox,92M-B105,jfox@calpoly.edu,805-756-2624,
+14,Hasmik  Gharibyan,14-207,hghariby@calpoly.edu,805-756-7068,
+15,Paul Hatalsky,14-203,phatalsk@calpoly.edu,805-756-2921,
+16,Michael Haungs,14-228,mhaungs@calpoly.edu,805-756-5531,"['Distributed Systems', 'Interprocess Communications', 'Networking', 'Operating Systems', 'Parallel Architecture']"
+17,Irene Humer,14-245,ihumer@calpoly.edu,805-756-5541,
+18,David Janzen,14-212,djanzen@calpoly.edu,805-756-2929,"['Agile Methods', 'Computer Science Pedagogy', 'Object-Oriented Systems', 'Software Engineering']"
+19,Daniel Kauffman,14-245,dkauffma@calpoly.edu,805-756-2824,['Artificial Intelligence']
+20,Aaron Keen,14-228,akeen@calpoly.edu,805-756-2926,"['Compilers', 'Distributed Computing', 'Operating Systems', 'Programming Languages']"
+21,Foaad Khosmood,14-213,foaad@calpoly.edu,805-756-2911,"['Artificial Intelligence', 'Data Mining', 'Games and Interactive Entertainment', 'Internet of Things', 'Natural Language Processing', 'Systems', 'Web Engineering']"
+22,Toshihiro Kuboi,92M-B105,tkuboi@calpoly.edu,805-756-2824,
+23,Franz Kurfess,14-218,fkurfess@calpoly.edu,805-756-7179,"['Artificial Intelligence', 'Knowledge-Based Systems', 'Usability']"
+24,Kurt Mammen,14-206,kmammen@calpoly.edu,805-756-1332,
+25,Andrew Migler,,avondoll@calpoly.edu,,
+26,Theresa Migler,14-226,tmigler@calpoly.edu,805-756-2824,"['Computer Science Outreach', 'Graph Theory', 'Network Analysis']"
+27,Kirsten Mork,,klmork@calpoly.edu,,
+28,Phillip Nico,14-205,pnico@calpoly.edu,805-756-7124,"['Compilers', 'Computer Architecture', 'Computer Security', 'Programming Languages']"
+29,Maria Pantoja,14-211,mpanto01@calpoly.edu,805-756-1330,"['Distributed Computing', 'High Performance Computing', 'Image/Video Compression', 'Machine Learning for Object Recognition', 'Parallel Programming']"
+30,David Parkinson,14-240,dsparkin@calpoly.edu,805-756-2824,
+31,Zachary N J Peterson,14-215,znjp@calpoly.edu,805-756-2088,"['Applied Cryptography', 'Computer Science Pedagogy', 'Secure Systems', 'Technology Law']"
+32,John Planck,20-200,jplanck@calpoly.edu,805-756-2781,
+33,Michael Reynosa,14-240,mreyno28@calpoly.edu,805-756-2824,
+34,Nicholas Sakellariou,14-240,nsakella@calpoly.edu,805-756-2824,
+35,John Seng,14-231,jseng@calpoly.edu,805-756-5536,"['Computer Architecture', 'Computer Engineering', 'Low Power Design']"
+36,Erin Sheets,14-240,easheets@calpoly.edu,805-756-2824,
+37,Christopher Siu,,cesiu@calpoly.edu,,
+38,Hugh Smith,14-216,husmith@calpoly.edu,805-756-2801,"['Computer Architecture', 'Computer Networks', 'Operating Systems', 'Parallel Systems']"
+39,Clint Staley,14-204,cstaley@calpoly.edu,805-756-2158,"['Online and Automated Instruction', 'Software Engineering', 'Web Development']"
+40,Lubomir Stanchev,14-230,lstanche@calpoly.edu,805-756-2958,"['Databases', 'Distributed Systems', 'Information Retrieval and Data Mining', 'Semantic Computing']"
+41,Clark Turner,14-222,csturner@calpoly.edu,805-756-6133,"['Small Satellite Communications and Operations', 'Software Engineering', 'Software Ethics', 'Software Liability', 'Software Safety']"
+42,Ignatios Vakalis,14-217,ivakalis@calpoly.edu,805-756-2824,"['Computational Mathematics', 'Computational Science Education', 'Graph Theory', 'Numerical Analysis', 'Parallel Computing', 'Teaching of Mathematics']"
+43,Michael Van De Vanter,92M-B105,mvandeva@calpoly.edu,805-756-2624,
+44,Jonathan Ventura,14-227,jventu09@calpoly.edu,805-756-5624,"['Augumented Reality', 'Computer Vision', 'Deep Learning', 'Medical and Scientific Image Analysis', 'Robotics']"
+45,Kurt Voelker,14-202,kvoelker@calpoly.edu,805-756-7186,
+46,Zoë Wood,14-209,zwood@calpoly.edu,805-756-5540,"['Computer Graphics', 'Geometric Modeling', 'Scientific Visualization']"
+47,Julie Workman,14-206,jworkman@calpoly.edu,805-756-6168,
+48,Jane Lehr,47-25F,jlehr@calpoly.edu,805-756-6442,
+49,Dennis Sun,25-109,dsun09@calpoly.edu,805-756-5877,
+50,Charles Dana,14-240,chdana@calpoly.edu,805-756-1331,"['Graphical User Interfaces', 'Java Programming Language- Especially GUI Projects', 'Modern Programming Languages', 'Professional Responsibilities', 'Software Tools']"
+51,Tim Kearns,14-245,tkearns@calpoly.edu,805-756-5541,"['Bioinformatics', 'Computer Security', 'Data Mining']"
+52,Leanne Fiorentino,14-254, lfiorent@calpoly.edu,,
+53,Tedd Akdag,14-235B, takdag@calpoly.edu,,
+54,Diana Wilson,14-238D, dwilso27@calpoly.edu,,
+55,Teresa Medrano,14-254, tlmedran@calpoly.edu,,
+56,Lynne Slivovsky,20A-215,lslivovs@calpoly.edu,805-756-1229,
+57,John Bellardo,14-235D,bellardo@calpoly.edu,805-756-7256,
+58,Bridget Benson,20-100,bbenson@calpoly.edu,805-756-5738,
+59,David Braun,20-304,dbraun@calpoly.edu,805-756-1464,
+60,Joseph Callenes-Sloan,20A-314,jcallene@calpoly.edu,805-756-5607,
+61,Andrew Danowitz,20A-306,adanowit@calpoly.edu,805-756-2756,
+62,Bruce DeBruhl,14-214,bdebruhl@calpoly.edu,805-756-1392,
+63,Foaad Khosmood,14-213,foaad@calpoly.edu,805-756-2911,
+64,Chris Lupo,14-254,clupo@calpoly.edu,805-756-5659,
+65,James Mealy,20-300,bmealy@calpoly.edu,805-756-2300,
+66,Phil Nico,14-205,pnico@calpoly.edu,805-756-7124,
+67,John Oliver,20A-316,jyoliver@calpoly.edu,805-756-5434,
+68,Maria Pantoja,14-211,mpanto01@calpoly.edu,805-756-1330,
+69,John Seng,14-231,jseng@calpoly.edu,805-756-5536,
+70,Tina Smilkstein,20-318,tsmilkst@calpoly.edu,805-756-2497,
+71,Hugh Smith,14-216,husmith@calpoly.edu,805-756-2801,
+72,Paul Hummel,20-117,phummel@calpoly.edu,805-756-5618,
+73,Jim Beug,,jbeug@calpoly.edu,,
+74,Joe Grimes,14-240,jgrimes@calpoly.edu,805-756-2088,
+75,Jim Harris,20-305,jharris@calpoly.edu,805-756-5708,
+76,Lew Hitchner,,,,
+77,John Hsu,,,,
+78,Elmo Keller,,,,
+79,Wayne  McMorran,,wmcmorra@calpoly.edu,,
+80,Richard Sandige,,,,
+81,Dan Stearns,,,,
+82,Donna Aiken,20A-215, daiken@calpoly.edu,,
