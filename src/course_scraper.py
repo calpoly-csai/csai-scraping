@@ -27,15 +27,13 @@ class CourseScraper:
     def transform_course_to_db(course: dict):
         db_course = {
             'dept': course['DEPARTMENT'],
-            'course_num': course['COURSE_NUM'],
-            'course_name': course['COURSE_NAME'],
+            'courseNum': course['COURSE_NUM'],
+            'courseName': course['COURSE_NAME'],
             'units': course['UNITS'],
             'raw_prerequisites_text': course['PREREQUISITES'],
             'raw_concurrent_text': course['CONCURRENT'],
             'raw_recommended_text': course['RECOMMENDED'],
-            'terms_offered': course['TERMS_TYPICALLY_OFFERED'],
-            'ge_areas': course['GE_AREAS'],
-            'desc': course['COURSE_DESC']
+            'termsOffered': course['TERMS_TYPICALLY_OFFERED'],
         }
 
         return db_course
@@ -174,7 +172,7 @@ class CourseScraper:
                 ge_areas = maybe_join(ge_areas, ', ')
 
                 course_terms = [term for term in course_terms.split(',')
-                                if len(term) > 0]
+                                if len(term) > 0 and term in {'F', 'W', 'SP', 'SU', 'TBD'}]
 
                 document = {
                     "DEPARTMENT": dep_name,
