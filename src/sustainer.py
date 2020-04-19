@@ -25,7 +25,8 @@ def scrape_all(filename, log_level=8, verbosity=8):
     """
     data = dict()
     data['calendar_data'] = CalendarScraper().scrape(logfile=filename, log_level=log_level, verbosity=verbosity)
-    data['club_scraper'] = ClubScraper().scrape(logfile=filename, log_level=log_level, verbosity=verbosity)
+    # Clubs URL has changed with the ASI website being updated
+    # data['club_scraper'] = ClubScraper().scrape(logfile=filename, log_level=log_level, verbosity=verbosity)
     data['course_scraper'] = CourseScraper().scrape(logfile=filename, log_level=log_level, verbosity=verbosity)
     data['schedules_scraper'] = SchedulesScraper().scrape(logfile=filename, log_level=log_level, verbosity=verbosity)
     data['location_scraper'] = LocationScraper().scrape(logfile=filename, log_level=log_level, verbosity=verbosity)
